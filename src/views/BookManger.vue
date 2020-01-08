@@ -3,8 +3,7 @@
         <el-dialog
                 title="提示"
                 :visible.sync="dialogVisible"
-                width="30%"
-                :before-close="handleClose">
+                width="30%">
             <span>这是一段信息</span>
             <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
@@ -30,7 +29,7 @@
                 :data="books"
                 style="width: 80%">
             <el-table-column
-                    prop="id"
+                    prop="_id"
                     label="ID"
                     width="180">
             </el-table-column>
@@ -60,7 +59,6 @@
 </template>
 
 <script>
-    import _ from 'lodash'
     export default {
         name: "BookManger",
         data(){
@@ -68,19 +66,33 @@
                 maxId:2,
                 book:{name:'',price:''},
                 dialogVisible:false,
-                books:[{id:1,name:"book1",price:200},
-                    {id:2,name:"book2",price:230}]
+                books:[],
+                booksUrl:"http://localhost:3000/books"
             }
+        },
+        created() {
+            console.log("[INFO] Begin created")
+            fetch(this.booksUrl)
+                .then(res => res.json())
+                .then(bs => this.books = bs)
+            console.log("[INFO] Books init data"+this.books)
         },
         methods:{
             deleteBook(book){
-                let index=this.books.findIndex(item=>item.id==book.id)
-                this.books.splice(index,1)
+                console.log("[INFO] This is delete method"+book._id+"  ## "+book.price)
+                fetch(this.booksUrl+"/"+book._id,{method:"DELETE"})
+                    .then(res=>res.json())
+                    .then(()=>{
+                        let index = this.books.findIndex(item => item._id == book._id)
+                        this.books.splice(index, 1)
+                    })
             },
             addBook(){
-                this.book.id=++this.maxId
-                let bk=_.cloneDeep(this.book)
-                this.books.push(bk)
+                fetch(this.booksUrl, {
+                    method: "POST", headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(this.book)
+                }).then(res=>res.json())
+                    .then(nb=>this.books.push(nb))
             }
         },
         computed:{
