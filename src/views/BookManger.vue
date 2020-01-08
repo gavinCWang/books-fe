@@ -79,11 +79,12 @@
         },
         methods:{
             deleteBook(book){
-                console.log("[INFO] This is delete method"+book._id+"  ## "+book.price)
-                fetch(this.booksUrl+"/"+book._id,{method:"DELETE"})
+                console.log("[INFO] book info "+book)
+                console.log("[INFO] "+book.raw)
+                fetch(this.booksUrl+"/"+book.row._id,{method:"DELETE"})
                     .then(res=>res.json())
                     .then(()=>{
-                        let index = this.books.findIndex(item => item._id == book._id)
+                        let index = this.books.findIndex(item => item._id == book.row._id)
                         this.books.splice(index, 1)
                     })
             },
